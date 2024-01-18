@@ -13,11 +13,15 @@ services:
 
   redis:
     image: redis:7.2
+    networks:
+      misp:
 
   db:
     # We use MariaDB because it supports ARM and has the expected collations
     image: mariadb:10.11
     restart: always
+    networks:
+      misp:
     environment:
       - "MYSQL_USER=${MYSQL_USER:-misp}"
       - "MYSQL_PASSWORD=${MYSQL_PASSWORD:-example}"
@@ -30,6 +34,11 @@ services:
 
   misp-core:
     image: ghcr.io/misp/misp-docker/misp-core:latest
+    networks: 
+      misp:
+    deploy:
+      placement:
+          constraints: [node.role == manmager]
     build:
       context: core/.
       args:
@@ -49,8 +58,10 @@ services:
       - redis
       - db
     ports:
-      - "80:80"
-      - "443:443"
+      - target: 443
+        published: 9443
+        protocol: tcp
+        mode: host
     volumes:
       - "./configs/:/var/www/MISP/app/Config/"
       - "./logs/:/var/www/MISP/app/tmp/logs/"
@@ -97,6 +108,8 @@ services:
   
   misp-modules:
     image: ghcr.io/misp/misp-docker/misp-modules:latest
+    networks: 
+      misp:
     build:
       context: modules/.
       args:
@@ -107,6 +120,10 @@ services:
       - "REDIS_BACKEND=redis"
     depends_on:
       - redis
+
+networks:
+  misp:
+    driver: overlay
 
 volumes:
     mysql_data:
