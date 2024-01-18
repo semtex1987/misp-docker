@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 services:
   # This is capable to relay via gmail, Amazon SES, or generic relays
   # See: https://hub.docker.com/r/ixdotai/smtp
@@ -38,7 +38,7 @@ services:
       misp:
     deploy:
       placement:
-          constraints: [node.role == manmager]
+          constraints: [node.role == manager]
     build:
       context: core/.
       args:
@@ -59,15 +59,15 @@ services:
       - db
     ports:
       - target: 443
-        published: 9443
+        published: 8443
         protocol: tcp
         mode: host
     volumes:
-      - "./configs/:/var/www/MISP/app/Config/"
-      - "./logs/:/var/www/MISP/app/tmp/logs/"
-      - "./files/:/var/www/MISP/app/files/"
-      - "./ssl/:/etc/nginx/certs/"
-      - "./gnupg/:/var/www/MISP/.gnupg/"
+      - configs:/var/www/MISP/app/Config/
+      - logs:/var/www/MISP/app/tmp/logs/
+      - files:/var/www/MISP/app/files/
+      - ssl:/etc/nginx/certs/
+      - gnupg:/var/www/MISP/.gnupg/
       # customize by replacing ${CUSTOM_PATH} with a path containing 'files/customize_misp.sh'
       # - "${CUSTOM_PATH}/:/custom/"
     environment:
