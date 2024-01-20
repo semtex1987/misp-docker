@@ -136,8 +136,8 @@ networks:
 
 volumes:
     mysql_data:
-      configs:
-      logs:
-      files:
-      ssl:
-      gnupg:
+    configs:
+    logs:
+    files:
+    ssl:
+    gnupg:
